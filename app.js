@@ -3,6 +3,16 @@
    Firebase Firestore + GitHub API + Chart.js
 ═══════════════════════════════════════════ */
 
+// ── GA4 Config ────────────────────────────
+// Obtén este ID en: Google Cloud Console → APIs y servicios → Credenciales → OAuth 2.0
+const GA4_CLIENT_ID = '329516504476-fr88jh978m3k58htd7uo637h996ccqde.apps.googleusercontent.com';
+
+const GA4_PROPERTIES = {
+  TI3011: '534160397',
+  TI3032: '534168961',
+  TI3031: '530804457',
+};
+
 // ── Constants ──────────────────────────────
 const COURSES = {
   TI3011: { name: 'Lógica y Resolución de Problemas', color: 'purple', ghColor: '#8b5cf6' },
@@ -24,6 +34,7 @@ let allSuggestions = [];
 let charts = {};
 let db = null;
 let activeFilter = { course: 'all', type: null };
+let gaToken = null;
 
 // ── Firebase Init ────────────────────────────
 function initFirebase() {
@@ -413,6 +424,92 @@ function last30Days() {
   });
 }
 
+// ── GA4 ──────────────────────────────────────
+function initGA4() {
+  const btn = document.getElementById('ga4ConnectBtn');
+  if (!btn) return;
+
+  if (GA4_CLIENT_ID.startsWith('REEMPLAZA')) {
+    btn.textContent = 'Configura GA4_CLIENT_ID en app.js';
+    btn.disabled = true;
+    return;
+  }
+
+  function tryInit() {
+    if (typeof google === 'undefined' || !google.accounts?.oauth2) {
+      setTimeout(tryInit, 300);
+      return;
+    }
+    const tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: GA4_CLIENT_ID,
+      scope: 'https://www.googleapis.com/auth/analytics.readonly',
+      callback: async (resp) => {
+        if (resp.error) return;
+        gaToken = resp.access_token;
+        document.getElementById('ga4ConnectArea').style.display = 'none';
+        document.getElementById('ga4CardsGrid').classList.add('connected');
+        await loadAllGA4Data();
+      },
+    });
+    btn.addEventListener('click', () => tokenClient.requestAccessToken());
+  }
+  tryInit();
+}
+
+async function fetchGA4Report(propertyId) {
+  const resp = await fetch(
+    `https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:runReport`,
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${gaToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        dateRanges: [{ startDate: '30daysAgo', endDate: 'today' }],
+        metrics: [
+          { name: 'sessions' },
+          { name: 'activeUsers' },
+          { name: 'screenPageViews' },
+        ],
+      }),
+    }
+  );
+  if (!resp.ok) throw new Error(`GA4 ${resp.status}`);
+  return resp.json();
+}
+
+async function loadAllGA4Data() {
+  await Promise.allSettled(
+    Object.entries(GA4_PROPERTIES).map(async ([course, propId]) => {
+      const el = document.getElementById(`ga4-${course}`);
+      if (!el) return;
+      try {
+        const data = await fetchGA4Report(propId);
+        const vals     = data.rows?.[0]?.metricValues ?? [];
+        const sessions  = Number(vals[0]?.value ?? 0).toLocaleString('es-CL');
+        const users     = Number(vals[1]?.value ?? 0).toLocaleString('es-CL');
+        const pageviews = Number(vals[2]?.value ?? 0).toLocaleString('es-CL');
+        el.innerHTML = `
+          <div class="ga4-metric">
+            <span class="ga4-val">${sessions}</span>
+            <span class="ga4-lbl">Sesiones</span>
+          </div>
+          <div class="ga4-metric">
+            <span class="ga4-val">${users}</span>
+            <span class="ga4-lbl">Usuarios</span>
+          </div>
+          <div class="ga4-metric">
+            <span class="ga4-val">${pageviews}</span>
+            <span class="ga4-lbl">Vistas</span>
+          </div>`;
+      } catch {
+        el.innerHTML = `<span class="ga4-error">Sin acceso a esta propiedad</span>`;
+      }
+    })
+  );
+}
+
 // ── Boot ──────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   setupTheme();
@@ -420,4 +517,5 @@ document.addEventListener('DOMContentLoaded', () => {
   setupFilters();
   initCharts();
   initFirebase();
+  initGA4();
 });

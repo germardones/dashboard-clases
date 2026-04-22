@@ -184,6 +184,42 @@
         </div>
       </div>
 
+      <!-- GA4 Visits -->
+      <h2 class="section-title">Visitas — Último mes</h2>
+      <div class="ga4-section">
+        <div class="ga4-connect-area glass" id="ga4ConnectArea">
+          <div class="ga4-connect-icon">📈</div>
+          <div class="ga4-connect-text">
+            <strong>Conecta Google Analytics</strong>
+            <span>Visualiza las visitas de los últimos 30 días en cada curso</span>
+          </div>
+          <button class="ga4-connect-btn" id="ga4ConnectBtn">Conectar con Google</button>
+        </div>
+        <div class="ga4-cards-grid" id="ga4CardsGrid">
+          <div class="ga4-card glass">
+            <div class="ga4-card-header">
+              <span class="course-badge purple">TI3011</span>
+              <span class="ga4-period">últ. 30 días</span>
+            </div>
+            <div class="ga4-metrics" id="ga4-TI3011"><div class="ga4-skeleton"></div></div>
+          </div>
+          <div class="ga4-card glass">
+            <div class="ga4-card-header">
+              <span class="course-badge blue">TI3032</span>
+              <span class="ga4-period">últ. 30 días</span>
+            </div>
+            <div class="ga4-metrics" id="ga4-TI3032"><div class="ga4-skeleton"></div></div>
+          </div>
+          <div class="ga4-card glass">
+            <div class="ga4-card-header">
+              <span class="course-badge teal">TI3031</span>
+              <span class="ga4-period">últ. 30 días</span>
+            </div>
+            <div class="ga4-metrics" id="ga4-TI3031"><div class="ga4-skeleton"></div></div>
+          </div>
+        </div>
+      </div>
+
       <!-- Charts -->
       <h2 class="section-title">Analytics</h2>
       <div class="charts-grid">
@@ -312,6 +348,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- Google Identity Services (OAuth GA4) -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <!-- Config + App -->
   <script src="firebase-config.js"></script>
   <script src="app.js"></script>
