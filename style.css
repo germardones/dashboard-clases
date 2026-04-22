@@ -280,8 +280,21 @@ body {
 .sug-course.teal   { background: rgba(20, 184, 166, 0.15);  color: #5eead4; }
 .sug-paralelo { font-size: 0.75rem; color: var(--muted); }
 .sug-msg { font-size: 0.9rem; color: var(--text); line-height: 1.5; }
-.sug-time { font-size: 0.72rem; color: var(--muted); text-align: right; white-space: nowrap; }
-.sug-type-label { font-size: 0.72rem; text-align: right; color: var(--muted); }
+.sug-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 0.4rem; }
+.sug-time { font-size: 0.72rem; color: var(--muted); white-space: nowrap; }
+.sug-type-label { font-size: 0.72rem; color: var(--muted); }
+.sug-delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.15s;
+  padding: 0.1rem 0.2rem;
+  border-radius: 4px;
+}
+.sug-card:hover .sug-delete-btn { opacity: 0.5; }
+.sug-delete-btn:hover { opacity: 1 !important; transform: scale(1.15); }
 
 /* Suggestion grid (sugerencias view) */
 .sug-grid {
