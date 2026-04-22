@@ -196,11 +196,21 @@ function sugCard(s) {
         </div>
         <div class="sug-msg">${escHtml(s.mensaje || '')}</div>
       </div>
-      <div>
+      <div class="sug-actions">
         <div class="sug-time">${time}</div>
         <div class="sug-type-label">${s.tipo || ''}</div>
+        <button class="sug-delete-btn" onclick="deleteSuggestion('${s.id}')" title="Eliminar sugerencia">🗑</button>
       </div>
     </div>`;
+}
+
+async function deleteSuggestion(id) {
+  if (!confirm('¿Eliminar esta sugerencia? Esta acción no se puede deshacer.')) return;
+  try {
+    await db.collection('sugerencias').doc(id).delete();
+  } catch (e) {
+    alert('Error al eliminar: ' + e.message);
+  }
 }
 
 function emptyState(msg) {
