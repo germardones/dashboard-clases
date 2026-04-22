@@ -244,6 +244,42 @@ function initCharts() {
     }
   });
 
+  // Bar — GA4 visits per course
+  charts.ga4Visits = new Chart(document.getElementById('chartGA4Visits'), {
+    type: 'bar',
+    data: {
+      labels: ['TI3011', 'TI3032', 'TI3031'],
+      datasets: [
+        {
+          label: 'Sesiones',
+          data: [0, 0, 0],
+          backgroundColor: ['rgba(139,92,246,0.8)', 'rgba(59,130,246,0.8)', 'rgba(20,184,166,0.8)'],
+          borderRadius: 6, borderSkipped: false,
+        },
+        {
+          label: 'Usuarios',
+          data: [0, 0, 0],
+          backgroundColor: ['rgba(139,92,246,0.45)', 'rgba(59,130,246,0.45)', 'rgba(20,184,166,0.45)'],
+          borderRadius: 6, borderSkipped: false,
+        },
+        {
+          label: 'Vistas',
+          data: [0, 0, 0],
+          backgroundColor: ['rgba(139,92,246,0.2)', 'rgba(59,130,246,0.2)', 'rgba(20,184,166,0.2)'],
+          borderRadius: 6, borderSkipped: false,
+        },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { boxWidth: 12 } } },
+      scales: {
+        y: { beginAtZero: true, grid: { color: 'rgba(148,163,184,0.08)' } },
+        x: { grid: { display: false } },
+      },
+    },
+  });
+
   // Line — timeline (last 30 days)
   charts.timeline = new Chart(document.getElementById('chartTimeline'), {
     type: 'line',
@@ -480,27 +516,29 @@ async function fetchGA4Report(propertyId) {
 }
 
 async function loadAllGA4Data() {
+  const ga4Data = {};
   await Promise.allSettled(
     Object.entries(GA4_PROPERTIES).map(async ([course, propId]) => {
       const el = document.getElementById(`ga4-${course}`);
       if (!el) return;
       try {
         const data = await fetchGA4Report(propId);
-        const vals     = data.rows?.[0]?.metricValues ?? [];
-        const sessions  = Number(vals[0]?.value ?? 0).toLocaleString('es-CL');
-        const users     = Number(vals[1]?.value ?? 0).toLocaleString('es-CL');
-        const pageviews = Number(vals[2]?.value ?? 0).toLocaleString('es-CL');
+        const vals      = data.rows?.[0]?.metricValues ?? [];
+        const sessions  = Number(vals[0]?.value ?? 0);
+        const users     = Number(vals[1]?.value ?? 0);
+        const pageviews = Number(vals[2]?.value ?? 0);
+        ga4Data[course] = { sessions, users, pageviews };
         el.innerHTML = `
           <div class="ga4-metric">
-            <span class="ga4-val">${sessions}</span>
+            <span class="ga4-val">${sessions.toLocaleString('es-CL')}</span>
             <span class="ga4-lbl">Sesiones</span>
           </div>
           <div class="ga4-metric">
-            <span class="ga4-val">${users}</span>
+            <span class="ga4-val">${users.toLocaleString('es-CL')}</span>
             <span class="ga4-lbl">Usuarios</span>
           </div>
           <div class="ga4-metric">
-            <span class="ga4-val">${pageviews}</span>
+            <span class="ga4-val">${pageviews.toLocaleString('es-CL')}</span>
             <span class="ga4-lbl">Vistas</span>
           </div>`;
       } catch {
@@ -508,6 +546,18 @@ async function loadAllGA4Data() {
       }
     })
   );
+  updateGA4Chart(ga4Data);
+}
+
+function updateGA4Chart(ga4Data) {
+  if (!charts.ga4Visits) return;
+  const courses = ['TI3011', 'TI3032', 'TI3031'];
+  charts.ga4Visits.data.datasets[0].data = courses.map(c => ga4Data[c]?.sessions  ?? 0);
+  charts.ga4Visits.data.datasets[1].data = courses.map(c => ga4Data[c]?.users     ?? 0);
+  charts.ga4Visits.data.datasets[2].data = courses.map(c => ga4Data[c]?.pageviews ?? 0);
+  charts.ga4Visits.update();
+  const card = document.getElementById('ga4VisitsChartCard');
+  if (card) card.style.display = 'block';
 }
 
 // ── Boot ──────────────────────────────────────
