@@ -285,16 +285,20 @@ body {
 .sug-type-label { font-size: 0.72rem; color: var(--muted); }
 .sug-delete-btn {
   background: none;
-  border: none;
+  border: 1px solid transparent;
   cursor: pointer;
-  font-size: 0.9rem;
-  opacity: 0;
-  transition: opacity 0.2s, transform 0.15s;
-  padding: 0.1rem 0.2rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  transition: all 0.2s;
+  padding: 0.2rem 0.4rem;
   border-radius: 4px;
+  margin-top: 0.3rem;
 }
-.sug-card:hover .sug-delete-btn { opacity: 0.5; }
-.sug-delete-btn:hover { opacity: 1 !important; transform: scale(1.15); }
+.sug-delete-btn:hover {
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.4);
+  background: rgba(248, 113, 113, 0.1);
+}
 
 /* Suggestion grid (sugerencias view) */
 .sug-grid {
