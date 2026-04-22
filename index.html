@@ -102,88 +102,6 @@
         </div>
       </div>
 
-      <!-- Courses grid -->
-      <h2 class="section-title">Cursos</h2>
-      <div class="courses-grid">
-        <div class="course-card glass" data-repo="TI3011" data-color="purple">
-          <div class="course-top">
-            <span class="course-badge purple">TI3011</span>
-            <a href="https://github.com/germardones/TI3011" target="_blank" class="course-gh">↗ GitHub</a>
-          </div>
-          <h3 class="course-name">Lógica y Resolución de Problemas</h3>
-          <div class="course-metrics">
-            <div class="metric">
-              <span class="metric-val" id="c1-sugs">—</span>
-              <span class="metric-lbl">Sugerencias</span>
-            </div>
-            <div class="metric">
-              <span class="metric-val" id="c1-commits">—</span>
-              <span class="metric-lbl">Commits</span>
-            </div>
-            <div class="metric">
-              <span class="metric-val" id="c1-stars">—</span>
-              <span class="metric-lbl">Stars</span>
-            </div>
-          </div>
-          <div class="course-footer">
-            <span class="course-update" id="c1-update">Cargando...</span>
-            <a href="https://germardones.github.io/TI3011" target="_blank" class="btn-sm">Ver curso</a>
-          </div>
-        </div>
-
-        <div class="course-card glass" data-repo="TI3032" data-color="blue">
-          <div class="course-top">
-            <span class="course-badge blue">TI3032</span>
-            <a href="https://github.com/germardones/TI3032" target="_blank" class="course-gh">↗ GitHub</a>
-          </div>
-          <h3 class="course-name">Bases de Datos No Estructuradas</h3>
-          <div class="course-metrics">
-            <div class="metric">
-              <span class="metric-val" id="c2-sugs">—</span>
-              <span class="metric-lbl">Sugerencias</span>
-            </div>
-            <div class="metric">
-              <span class="metric-val" id="c2-commits">—</span>
-              <span class="metric-lbl">Commits</span>
-            </div>
-            <div class="metric">
-              <span class="metric-val" id="c2-stars">—</span>
-              <span class="metric-lbl">Stars</span>
-            </div>
-          </div>
-          <div class="course-footer">
-            <span class="course-update" id="c2-update">Cargando...</span>
-            <a href="https://germardones.github.io/TI3032" target="_blank" class="btn-sm">Ver curso</a>
-          </div>
-        </div>
-
-        <div class="course-card glass" data-repo="TI3031" data-color="teal">
-          <div class="course-top">
-            <span class="course-badge teal">TI3031</span>
-            <a href="https://github.com/germardones/TI3031" target="_blank" class="course-gh">↗ GitHub</a>
-          </div>
-          <h3 class="course-name">Programación Frontend</h3>
-          <div class="course-metrics">
-            <div class="metric">
-              <span class="metric-val" id="c3-sugs">—</span>
-              <span class="metric-lbl">Sugerencias</span>
-            </div>
-            <div class="metric">
-              <span class="metric-val" id="c3-commits">—</span>
-              <span class="metric-lbl">Commits</span>
-            </div>
-            <div class="metric">
-              <span class="metric-val" id="c3-stars">—</span>
-              <span class="metric-lbl">Stars</span>
-            </div>
-          </div>
-          <div class="course-footer">
-            <span class="course-update" id="c3-update">Cargando...</span>
-            <a href="https://germardones.github.io/TI3031" target="_blank" class="btn-sm">Ver curso</a>
-          </div>
-        </div>
-      </div>
-
       <!-- GA4 Visits -->
       <h2 class="section-title">Visitas — Último mes</h2>
       <div class="ga4-section">
@@ -216,6 +134,12 @@
               <span class="ga4-period">últ. 30 días</span>
             </div>
             <div class="ga4-metrics" id="ga4-TI3031"><div class="ga4-skeleton"></div></div>
+          </div>
+        </div>
+        <div class="chart-card glass" id="ga4VisitsChartCard" style="margin-top:1.5rem;display:none">
+          <h3 class="chart-title">Visitas por curso — últimos 30 días</h3>
+          <div class="chart-wrap chart-wrap-sm">
+            <canvas id="chartGA4Visits"></canvas>
           </div>
         </div>
       </div>
