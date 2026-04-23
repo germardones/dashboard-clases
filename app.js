@@ -290,6 +290,21 @@ function initCharts() {
     },
   });
 
+  // Line — GA4 daily visits per course
+  charts.ga4Daily = new Chart(document.getElementById('chartGA4Daily'), {
+    type: 'line',
+    data: { labels: [], datasets: [] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { boxWidth: 12 } } },
+      scales: {
+        y: { beginAtZero: true, grid: { color: 'rgba(148,163,184,0.08)' } },
+        x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } },
+      },
+      elements: { point: { radius: 2 }, line: { tension: 0.4 } },
+    },
+  });
+
   // Line — timeline (last 30 days)
   charts.timeline = new Chart(document.getElementById('chartTimeline'), {
     type: 'line',
@@ -525,19 +540,47 @@ async function fetchGA4Report(propertyId) {
   return resp.json();
 }
 
+async function fetchGA4DailyReport(propertyId) {
+  const resp = await fetch(
+    `https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:runReport`,
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${gaToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        dateRanges: [{ startDate: '30daysAgo', endDate: 'today' }],
+        dimensions: [{ name: 'date' }],
+        metrics: [{ name: 'screenPageViews' }],
+        orderBys: [{ dimension: { dimensionName: 'date' } }],
+      }),
+    }
+  );
+  if (!resp.ok) throw new Error(`GA4 ${resp.status}`);
+  return resp.json();
+}
+
 async function loadAllGA4Data() {
   const ga4Data = {};
+  const ga4Daily = {};
   await Promise.allSettled(
     Object.entries(GA4_PROPERTIES).map(async ([course, propId]) => {
       const el = document.getElementById(`ga4-${course}`);
       if (!el) return;
       try {
-        const data = await fetchGA4Report(propId);
+        const [data, daily] = await Promise.all([
+          fetchGA4Report(propId),
+          fetchGA4DailyReport(propId),
+        ]);
         const vals      = data.rows?.[0]?.metricValues ?? [];
         const sessions  = Number(vals[0]?.value ?? 0);
         const users     = Number(vals[1]?.value ?? 0);
         const pageviews = Number(vals[2]?.value ?? 0);
         ga4Data[course] = { sessions, users, pageviews };
+        ga4Daily[course] = Object.fromEntries(
+          (daily.rows ?? []).map(r => [r.dimensionValues[0].value, Number(r.metricValues[0].value)])
+        );
         el.innerHTML = `
           <div class="ga4-metric">
             <span class="ga4-val">${sessions.toLocaleString('es-CL')}</span>
@@ -557,6 +600,31 @@ async function loadAllGA4Data() {
     })
   );
   updateGA4Chart(ga4Data);
+  updateGA4DailyChart(ga4Daily);
+}
+
+function updateGA4DailyChart(ga4Daily) {
+  if (!charts.ga4Daily) return;
+
+  // Build sorted list of all dates across all courses
+  const dateSet = new Set();
+  Object.values(ga4Daily).forEach(byDate => Object.keys(byDate).forEach(d => dateSet.add(d)));
+  const sortedDates = [...dateSet].sort();
+
+  const courseColors = { TI3011: '#8b5cf6', TI3032: '#3b82f6', TI3031: '#14b8a6' };
+
+  charts.ga4Daily.data.labels = sortedDates.map(d => `${d.slice(6,8)}/${d.slice(4,6)}`);
+  charts.ga4Daily.data.datasets = Object.entries(ga4Daily).map(([course, byDate]) => ({
+    label: course,
+    data: sortedDates.map(d => byDate[d] ?? 0),
+    borderColor: courseColors[course] ?? '#94a3b8',
+    backgroundColor: (courseColors[course] ?? '#94a3b8') + '22',
+    fill: true,
+  }));
+  charts.ga4Daily.update();
+
+  const card = document.getElementById('ga4DailyChartCard');
+  if (card) card.style.display = 'block';
 }
 
 function updateGA4Chart(ga4Data) {
